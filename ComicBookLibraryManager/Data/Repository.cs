@@ -137,7 +137,6 @@ namespace ComicBookLibraryManager.Data
             {
                 context.ComicBooks.Add(comicBook);
 
-
                 // Defensive Coding
                 if (comicBook.Series != null && comicBook.Series.Id > 0)
                 {
@@ -167,7 +166,57 @@ namespace ComicBookLibraryManager.Data
         /// <param name="comicBook">The ComicBook entity instance to update.</param>
         public static void UpdateComicBook(ComicBook comicBook)
         {
-            // TODO
+            // The comicBook being passed in is disconnected/detached 
+
+            // Many approaches to update the comic book.
+
+            // Option 1: 
+
+            //using (var context = GetContext())
+            //{
+            //    var comicBookToUpdate = context.ComicBooks.Find(comicBook.Id);
+
+            //    comicBookToUpdate.SeriesId = comicBook.SeriesId;
+            //    comicBookToUpdate.IssueNumber = comicBook.IssueNumber;
+            //    comicBookToUpdate.Description = comicBook.Description;
+            //    comicBookToUpdate.PublishedOn = comicBook.PublishedOn;
+            //    comicBookToUpdate.AverageRating = comicBook.AverageRating;
+
+            //    context.SaveChanges();
+            //}
+
+            // Option 2:
+            // Requires two queries
+            //using (var context = GetContext())
+            //{
+            //    var comicBookToUpdate = context.ComicBooks.Find(comicBook.Id);
+            //    context.Entry(comicBookToUpdate).CurrentValues.SetValues(comicBook);
+            //    context.SaveChanges();
+            //}
+
+            // Option 3:
+            // Only one query to update, but every column is updated
+            //using (var context = GetContext())
+            //{
+            //    context.ComicBooks.Attach(comicBook);
+            //    context.Entry(comicBook).State = EntityState.Modified;
+
+            //    context.SaveChanges();
+            //}
+
+            // Option 4:
+            using (var context = GetContext())
+            {
+                context.ComicBooks.Attach(comicBook);
+                var comicBookEntry = context.Entry(comicBook);
+                comicBookEntry.State = EntityState.Modified;
+                // can set individual properties IsModified to false so that column is not updated
+                // comicBookEntry.Property("IssueNumber").IsModified = false;
+
+                context.SaveChanges();
+
+            }
+
         }
 
         /// <summary>
