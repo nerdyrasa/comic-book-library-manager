@@ -225,7 +225,19 @@ namespace ComicBookLibraryManager.Data
         /// <param name="comicBookId">The comic book ID to delete.</param>
         public static void DeleteComicBook(int comicBookId)
         {
-            // TODO
+            using (var context = GetContext())
+            {
+                // create a stub comicbook entity and set its id property value
+                // to the id parameter that was passed in 
+
+                var comicBook = new ComicBook() { Id = comicBookId };
+
+                // retrieve the entry using the context's Entry method
+                context.Entry(comicBook).State = EntityState.Deleted;
+
+                // persist changes to the database
+                context.SaveChanges();
+            }
         }
     }
 }
